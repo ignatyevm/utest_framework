@@ -8,5 +8,5 @@ TEST_CASE("test 4") {
 // one more false assertion
 TEST_CASE("test 5") {
     using std::literals::operator""sv;
-    ASSERT("hello"sv == "world"sv);
+    ASSERT("hello"sv == "world"sv, "hello world");
 }
