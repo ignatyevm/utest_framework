@@ -15,11 +15,11 @@ namespace utest {
                       std::string_view message)
                     : condition(condition), condition_value(condition_value), file(file), line(line),
                       message(message) {}
-            std::string_view what_condition() const { return condition; }
-            bool is_false() const { return condition_value; }
-            std::string_view what_file() const { return file; }
-            int what_line() const { return line; }
-            std::string_view what_message() const { return message; }
+            [[nodiscard]] std::string_view what_condition() const { return condition; }
+            [[nodiscard]] bool is_false() const { return !condition_value; }
+            [[nodiscard]] std::string_view what_file() const { return file; }
+            [[nodiscard]] int what_line() const { return line; }
+            [[nodiscard]] std::string_view what_message() const { return message; }
         private:
             std::string_view condition;
             bool condition_value;
@@ -39,11 +39,11 @@ namespace utest {
                                     std::string_view file, int line, std::string_view message = "") {
             assertions[test_name].emplace_back(condition, condition_value, file, line, message);
         }
-        inline void print_assertion_info(const detail::assertion& fail) noexcept {
-            std::cerr << "Assertion failed in " << fail.what_file() << ":" << fail.what_line() << ": "
-                      << fail.what_condition() << std::endl;
-            if (!fail.what_message().empty()) {
-                std::cerr << "    With message: " << fail.what_message() << std::endl;
+        inline void print_assertion_info(const detail::assertion& assertion) noexcept {
+            std::cerr << "Assertion failed in " << assertion.what_file() << ":" << assertion.what_line() << ": "
+                      << assertion.what_condition() << std::endl;
+            if (!assertion.what_message().empty()) {
+                std::cerr << "    With message: " << assertion.what_message() << std::endl;
             }
         }
     }
@@ -58,7 +58,7 @@ namespace utest {
             std::vector<std::reference_wrapper<const detail::assertion>> fails;
             fails.reserve(assertions.size());
             for (const auto& assertion : assertions) {
-                if (!assertion.is_false()) {
+                if (assertion.is_false()) {
                     fails.emplace_back(std::cref(assertion));
                 }
             }
